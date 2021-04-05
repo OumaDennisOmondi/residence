@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddVerificationToUsersTable extends Migration
+class AddActionsToAddresses extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,9 @@ class AddVerificationToUsersTable extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            //
-            $table->integer('otp_code')->default('1234');
-            $table->timestamp('expires_at')->nullable();
+        Schema::table('addresses', function (Blueprint $table) {
+        $table->integer('likes')->unsigned()->default(0);
+        $table->integer('shares')->unsigned()->default(0);
         });
     }
 
@@ -27,10 +26,10 @@ class AddVerificationToUsersTable extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('addresses', function (Blueprint $table) {
             //
-            $table->dropColumn('otp_code');
-            $table->dropColumn('expires_at');
+            $table->dropColumn('likes');
+            $table->dropColumn('shares');
         });
     }
 }

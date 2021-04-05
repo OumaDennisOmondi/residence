@@ -45,6 +45,8 @@ class CreateAddressesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('b_addresses');
+        Schema::table('addresses', function($table) {
+            $table->dropColumn('paid');
+        });
     }
 }

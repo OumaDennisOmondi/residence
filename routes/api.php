@@ -29,7 +29,16 @@ Route::post('create-b-address', [\App\Http\Controllers\AddressController::class,
 //create-new adress
 Route::post('create-r-address', [\App\Http\Controllers\ResidentialAddressController::class,'store']);
 //search to claim
-Route::post('search-to-claim', [\App\Http\Controllers\UniversalAddressController::class,'search_to_claim']);
+Route::get('search-to-claim', [\App\Http\Controllers\UniversalAddressController::class,'search_to_claim']);
+//claim to claim
+Route::post('claim-address', [\App\Http\Controllers\UniversalAddressController::class,'claim_address']);
+//list addreses in homepage
+Route::get('home', [\App\Http\Controllers\UniversalAddressController::class,'home']);
+//view single address
+Route::get('view/{address_id}', [\App\Http\Controllers\UniversalAddressController::class,'view']);
+//like unlike share
+Route::post('action', [\App\Http\Controllers\UniversalAddressController::class,'action']);
+
 //return last location id
 Route::get('last-id', [\App\Http\Controllers\AddressController::class,'generateLocationID']);
 Route::group([

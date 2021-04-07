@@ -21,8 +21,10 @@ class ResidentialAddress extends Model
         return $subcounty_id;
     }
     public function getOwnerIdAttribute($value){
-        $owner=User::find($value)->name;
-        return $owner;
+        if($owner=User::find($value)){
+            return $owner->name;
+        }
+        return 'unclaimed';
     }
     public function getCreatedByAttribute($value){
         $creator=User::find($value)->name;

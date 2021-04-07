@@ -24,8 +24,7 @@ class UniversalAddressController extends Controller
         } 
         return response()->json(['address'=> $address],200);
      }
-    public function search_to_claim(Request $request){
-        $location_id=$request->query('location_id');
+    public function search_to_claim($location_id){
         if (stripos($location_id, 'B') !== false) {
             $addresses=Address::where('location_id',$location_id)->get();
             return response()->json(['address_type' => 'business', 'addresess'=> $addresses],200);

@@ -29,8 +29,8 @@ Route::post('create-b-address', [\App\Http\Controllers\AddressController::class,
 //create-new adress
 Route::post('create-r-address', [\App\Http\Controllers\ResidentialAddressController::class,'store']);
 //search to claim
-Route::get('search-to-claim', [\App\Http\Controllers\UniversalAddressController::class,'search_to_claim']);
-//claim to claim
+Route::get('search-to-claim/{location_id}', [\App\Http\Controllers\UniversalAddressController::class,'search_to_claim']);
+//to claim
 Route::post('claim-address', [\App\Http\Controllers\UniversalAddressController::class,'claim_address']);
 //list addreses in homepage
 Route::get('home', [\App\Http\Controllers\UniversalAddressController::class,'home']);

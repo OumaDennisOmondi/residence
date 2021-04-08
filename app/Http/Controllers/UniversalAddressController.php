@@ -102,4 +102,13 @@ class UniversalAddressController extends Controller
         $address->save();
         return response()->json(['success' => 'liked'],200);
     }
+
+    public function my_addresses(){
+        $b_addresses=Address::where('owner_id',auth()->user()->id)->get();
+        $r_addresses=ResidentialAddress::where('owner_id',auth()->user()->id)->get();
+        if(! $b_addresses && ! $r_addresses){
+            return response()->json(['error' => 'You have not claimed any address'],404);
+        }
+        return response()->json(['addresses' => ['business' => $b_addresses, 'residential' => $r_addresses]],200);
+    }
 }

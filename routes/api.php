@@ -38,6 +38,8 @@ Route::get('home', [\App\Http\Controllers\UniversalAddressController::class,'hom
 Route::get('view/{address_id}', [\App\Http\Controllers\UniversalAddressController::class,'view']);
 //like unlike share
 Route::post('action', [\App\Http\Controllers\UniversalAddressController::class,'action']);
+//like unlike share
+Route::get('my-addresses', [\App\Http\Controllers\UniversalAddressController::class,'my_addresses']);
 
 //return last location id
 Route::get('last-id', [\App\Http\Controllers\AddressController::class,'generateLocationID']);

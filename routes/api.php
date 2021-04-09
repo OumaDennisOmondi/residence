@@ -32,13 +32,16 @@ Route::post('create-r-address', [\App\Http\Controllers\ResidentialAddressControl
 Route::get('search-to-claim/{location_id}', [\App\Http\Controllers\UniversalAddressController::class,'search_to_claim']);
 //to claim
 Route::post('claim-address', [\App\Http\Controllers\UniversalAddressController::class,'claim_address']);
+
+//to unclaim.action invoked from my-addresses page
+Route::post('unclaim-address', [\App\Http\Controllers\UniversalAddressController::class,'unclaim_address']);
 //list addreses in homepage
 Route::get('home', [\App\Http\Controllers\UniversalAddressController::class,'home']);
 //view single address
 Route::get('view/{address_id}', [\App\Http\Controllers\UniversalAddressController::class,'view']);
 //like unlike share
 Route::post('action', [\App\Http\Controllers\UniversalAddressController::class,'action']);
-//like unlike share
+//my addresses
 Route::get('my-addresses', [\App\Http\Controllers\UniversalAddressController::class,'my_addresses']);
 
 //return last location id

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Address;
+use App\Notifications\AddressRegistered;
 class AddressController extends Controller
 {
     //
@@ -86,7 +87,7 @@ class AddressController extends Controller
      curl_setopt($ch,CURLOPT_TIMEOUT, 20);
      $response1 = curl_exec($ch);
      curl_close ($ch);
-
+        auth()->user()->notify(new AddressRegistered($b_address));
         return response()->json(['addres_type' =>'business','address'=> $b_address], 200);
     }
 

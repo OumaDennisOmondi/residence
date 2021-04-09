@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\ResidentialAddress;
+use App\Notifications\AddressRegistered;
 class ResidentialAddressController extends Controller
 {
     //
@@ -79,7 +80,7 @@ class ResidentialAddressController extends Controller
      curl_setopt($ch,CURLOPT_TIMEOUT, 20);
      $response1 = curl_exec($ch);
      curl_close ($ch);
-
+        auth()->user()->notify(new AddressRegistered($r_address));
         return response()->json(['addres_type' =>'residential','address'=> $r_address], 200);
     }
 

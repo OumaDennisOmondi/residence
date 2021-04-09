@@ -43,6 +43,12 @@ Route::get('view/{address_id}', [\App\Http\Controllers\UniversalAddressControlle
 Route::post('action', [\App\Http\Controllers\UniversalAddressController::class,'action']);
 //my addresses
 Route::get('my-addresses', [\App\Http\Controllers\UniversalAddressController::class,'my_addresses']);
+//get all notifications
+Route::get('all-notifications', [\App\Http\Controllers\NotificationsContoller::class,'all']);
+//get unread notifications
+Route::get('unread-notifications', [\App\Http\Controllers\NotificationsContoller::class,'unread']);
+//get read notifications
+Route::get('read-notification/{id}', [\App\Http\Controllers\NotificationsContoller::class,'read']);
 
 //return last location id
 Route::get('last-id', [\App\Http\Controllers\AddressController::class,'generateLocationID']);

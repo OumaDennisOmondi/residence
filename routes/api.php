@@ -15,15 +15,23 @@ use Illuminate\Support\Facades\Route;
 */ 
 Route::post('create-account', [\App\Http\Controllers\AuthController::class,'createAccount']);
 Route::post('login', [\App\Http\Controllers\AuthController::class,'login']);
+Route::post('logout', [\App\Http\Controllers\AuthController::class,'logout']);
 Route::post('verify-otp', [\App\Http\Controllers\AuthController::class,'verifyOTP']);
 Route::post('resend-otp', [\App\Http\Controllers\AuthController::class,'resendOTP']);
 Route::post('reset-password', [\App\Http\Controllers\AuthController::class,'resetPassword']);
+//get user details
+Route::get('user-details', [\App\Http\Controllers\AuthController::class,'fetchUser']);
+//update user profile
+Route::post('update-profile', [\App\Http\Controllers\AuthController::class,'updateProfile']);
+//update user password
+Route::post('update-password', [\App\Http\Controllers\AuthController::class,'updatePassword']);
+
 //get services
 Route::get('services', [\App\Http\Controllers\ServiceController::class,'index']);
 //get counties
 Route::get('counties', [\App\Http\Controllers\CountyController::class,'index']);
 //get subcounties
-Route::post('subcounties', [\App\Http\Controllers\SubcountyController::class,'index']);
+Route::get('subcounties/{county_id}', [\App\Http\Controllers\SubcountyController::class,'index']);
 //create-new adress
 Route::post('create-b-address', [\App\Http\Controllers\AddressController::class,'store']);
 //create-new adress
@@ -35,14 +43,17 @@ Route::post('claim-address', [\App\Http\Controllers\UniversalAddressController::
 
 //to unclaim.action invoked from my-addresses page
 Route::post('unclaim-address', [\App\Http\Controllers\UniversalAddressController::class,'unclaim_address']);
-//list addreses in homepage
+//list b-addreses in homepage
 Route::get('home', [\App\Http\Controllers\UniversalAddressController::class,'home']);
 //view single address
 Route::get('view/{address_id}', [\App\Http\Controllers\UniversalAddressController::class,'view']);
 //like unlike share
 Route::post('action', [\App\Http\Controllers\UniversalAddressController::class,'action']);
-//my addresses
+//my claimed addresses
 Route::get('my-addresses', [\App\Http\Controllers\UniversalAddressController::class,'my_addresses']);
+
+//my un-claimed addresses
+Route::get('all-my-addresses', [\App\Http\Controllers\UniversalAddressController::class,'all_my_addresses']);
 //get all notifications
 Route::get('all-notifications', [\App\Http\Controllers\NotificationsContoller::class,'all']);
 //get unread notifications
@@ -60,8 +71,9 @@ Route::group([
 ], function ($router) {
 
     
-    Route::post('logout', [\App\Http\Controllers\AuthController::class,'logout']);
+    
     Route::post('refresh', [\App\Http\Controllers\AuthController::class,'refresh']);
-    Route::post('me', [\App\Http\Controllers\AuthController::class,'me']);
     
 });
+//initiate mpesa
+Route::post('process-claim', [\App\Http\Controllers\PaymentController::class,'processClaim']);

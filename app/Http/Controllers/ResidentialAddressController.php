@@ -62,7 +62,7 @@ class ResidentialAddressController extends Controller
        'shortCode' => 'VasPro',
        'recipient' => strval(auth()->user()->phone),
        'enqueue' => 0,
-       'message' => 'Thanks for registering, The Residential Location ID is '.$r_address->location_id.', Unique Address ID is '.$r_address->address_id,
+       'message' => 'Thanks for registering, The Residential Location ID is '.$r_address->location_id,
        "callbackURL" => "http://vaspro.co.ke/dlr"
      ];
      

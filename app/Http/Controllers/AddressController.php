@@ -18,8 +18,8 @@ class AddressController extends Controller
             'business_name' => 'required|string|unique:addresses|max:255',
             'service_id' => 'required|numeric',
             'service_description' => 'required|string|max:255',
-            'phone' =>'required|numeric',
-            'email' => 'required|email',
+            'phone' =>'required|numeric|unique:addresses',
+            'email' => 'required|email|unique:addresses',
             'road' => 'required',
             'county_id' => 'required|numeric',
             'subcounty_id' =>'required|numeric',
@@ -69,7 +69,7 @@ class AddressController extends Controller
        'shortCode' => 'VasPro',
        'recipient' => strval(auth()->user()->phone),
        'enqueue' => 0,
-       'message' => 'Thanks for registering '.$b_address->business_name.', The Residence Business Location ID is '.$b_address->location_id.', Unique Address ID is '.$b_address->address_id,
+       'message' => 'Thanks for registering '.$b_address->business_name.', The Residence Business Location ID is '.$b_address->location_id,
        "callbackURL" => "http://vaspro.co.ke/dlr"
      ];
      

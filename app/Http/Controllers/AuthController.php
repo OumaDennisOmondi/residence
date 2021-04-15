@@ -58,7 +58,7 @@ class AuthController extends Controller
         $credentials = request(['email', 'password']);
 
         if (! $token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Wrong credentials'], 401);
         }
 
         return $this->respondWithToken($token);
@@ -69,10 +69,50 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function me()
+    public function fetchUser()
     { 
         if(auth()->user()){
            return response()->json(auth()->user());
+        }
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+    /**
+     * update the authenticated User.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateProfile(Request $request)
+    { 
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|unique:users|email',
+            'phone' => 'required|numeric|unique:users',
+           
+          ]);
+        
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+        if(auth()->user()){
+         $user= User::find(auth()->user()->id);
+         $user->name = $request->name;
+         $user->email = $request->email;
+         $user->phone = $request->phone;
+         $user->save();
+         //$this->refresh();
+           return response()->json(['success' =>'Profile Updated succesfully','user' =>$user],200);
+        }
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+ ///update user password
+    public function updatePassword(Request $request)
+    { 
+        if(auth()->user()){
+         $user= User::find(auth()->user()->id);
+         $user->password = Hash::make($request->password);
+         $user->save();
+         //$this->refresh();
+           return response()->json(['success' =>'Password Updated succesfully'],200);
         }
         return response()->json(['error' => 'Unauthorized'], 401);
     }

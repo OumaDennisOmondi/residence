@@ -23,6 +23,9 @@ Route::post('reset-password', [\App\Http\Controllers\AuthController::class,'rese
 Route::get('user-details', [\App\Http\Controllers\AuthController::class,'fetchUser']);
 //update user profile
 Route::post('update-profile', [\App\Http\Controllers\AuthController::class,'updateProfile']);
+//update user profile pic
+Route::post('update-profile-pic', [\App\Http\Controllers\AuthController::class,'updateProfilePic']);
+
 //update user password
 Route::post('update-password', [\App\Http\Controllers\AuthController::class,'updatePassword']);
 
@@ -32,10 +35,15 @@ Route::get('services', [\App\Http\Controllers\ServiceController::class,'index'])
 Route::get('counties', [\App\Http\Controllers\CountyController::class,'index']);
 //get subcounties
 Route::get('subcounties/{county_id}', [\App\Http\Controllers\SubcountyController::class,'index']);
-//create-new adress
+//create-new business adress
 Route::post('create-b-address', [\App\Http\Controllers\AddressController::class,'store']);
+//edit-business adress
+Route::post('edit-b-address/{address_id}', [\App\Http\Controllers\AddressController::class,'edit']);
 //create-new adress
 Route::post('create-r-address', [\App\Http\Controllers\ResidentialAddressController::class,'store']);
+//edit-residential adress
+Route::post('edit-r-address/{address_id}', [\App\Http\Controllers\ResidentialAddressController::class,'edit']);
+
 //search to claim
 Route::get('search-to-claim/{location_id}', [\App\Http\Controllers\UniversalAddressController::class,'search_to_claim']);
 //to claim
@@ -52,7 +60,7 @@ Route::post('action', [\App\Http\Controllers\UniversalAddressController::class,'
 //my claimed addresses
 Route::get('my-addresses', [\App\Http\Controllers\UniversalAddressController::class,'my_addresses']);
 
-//my un-claimed addresses
+//my all addresses
 Route::get('all-my-addresses', [\App\Http\Controllers\UniversalAddressController::class,'all_my_addresses']);
 //get all notifications
 Route::get('all-notifications', [\App\Http\Controllers\NotificationsContoller::class,'all']);
@@ -77,3 +85,4 @@ Route::group([
 });
 //initiate mpesa
 Route::post('process-claim', [\App\Http\Controllers\PaymentController::class,'processClaim']);
+Route::get('sms', [\App\Http\Controllers\UniversalAddressController::class,'send_sms']);

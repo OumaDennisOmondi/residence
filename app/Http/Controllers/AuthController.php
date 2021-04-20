@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\SMSController;
 class AuthController extends Controller
 {
     /**
@@ -15,9 +16,10 @@ class AuthController extends Controller
      *
      * @return void
      */
-    public function __construct()
-    {
-       // $this->middleware('auth:api', ['except' => ['login']]);
+    protected $SMSController;
+    public function __construct(SMSController $SMSController){
+        $this->SMSController = $SMSController;
+       // $this->middleware('auth', ['except' => ['home','pay','view','action','send_sms']]);
     }
     public function createAccount(Request $request){
         $validator = Validator::make($request->all(), [
@@ -104,6 +106,31 @@ class AuthController extends Controller
         }
         return response()->json(['error' => 'Unauthorized'], 401);
     }
+
+    public function updateProfilePic(Request $request)
+    { 
+        $validator = Validator::make($request->all(), [
+            'image_path' => 'required|mimes:jpeg,jpg,png|max:2048',
+           
+          ]);
+        
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+        $fileName = time().'.'.$request->image_path->extension();  
+   
+        $request->image_path->move(public_path('profile_pics'), $fileName);
+        $image_path=config('app.url').'/profile_pics/'.$fileName;
+        
+        if(auth()->user()){
+         $user= User::find(auth()->user()->id);
+         $user->profile_pic = $image_path;
+         $user->save();
+         //$this->refresh();
+           return response()->json(['success' =>'Profile Picture Updated succesfully','user' =>$user],200);
+        }
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
  ///update user password
     public function updatePassword(Request $request)
     { 
@@ -166,30 +193,10 @@ class AuthController extends Controller
     }
     //send otp
     public function sendOTP($name,$phone,$otp_code){
-        $ch = curl_init();
-          $params=[
-         'apiKey' => '120ca9639da262edc34804590b59cb40',
-         'shortCode' => 'VasPro',
-         'recipient' => strval($phone),
-         'enqueue' => 0,
-         'message' => 'Dear '.$name.', Your Residence Verification Code is '.$otp_code,
-         "callbackURL" => "http://vaspro.co.ke/dlr"
-       ];
+        
+       $message = 'Dear '.$name.', Your Residence Verification Code is '.$otp_code;
+       $this->SMSController->sendSMS($message, strval($phone));
        
-       
-       $headers = array(
-           'Cache-control: no-cache',
-       );
-       $url = "https://api.vaspro.co.ke/v3/BulkSMS/api/create";
-       curl_setopt($ch,CURLOPT_URL, $url);
-       curl_setopt($ch,CURLOPT_POST, 1);                //0 for a get request
-       curl_setopt($ch,CURLOPT_POSTFIELDS, json_encode($params));
-       curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);;
-       curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
-       curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,300);
-       curl_setopt($ch,CURLOPT_TIMEOUT, 20);
-       $response1 = curl_exec($ch);
-       curl_close ($ch);
     }
       //resend otp
       public function resendOTP(Request $request){
@@ -200,30 +207,10 @@ class AuthController extends Controller
         $user=User::find($user->id);
         $user->otp_code= $otp_code;
         $user->save();
-        $ch = curl_init();
-          $params=[
-         'apiKey' => '120ca9639da262edc34804590b59cb40',
-         'shortCode' => 'VasPro',
-         'recipient' => strval($phone),
-         'enqueue' => 0,
-         'message' => 'Your Residence Verification Code is '.$otp_code,
-         "callbackURL" => "http://vaspro.co.ke/dlr"
-       ];
+        
+       $message = 'Your Residence Verification Code is '.$otp_code;
+       $this->SMSController->sendSMS($message, strval($phone));
        
-       
-       $headers = array(
-           'Cache-control: no-cache',
-       );
-       $url = "https://api.vaspro.co.ke/v3/BulkSMS/api/create";
-       curl_setopt($ch,CURLOPT_URL, $url);
-       curl_setopt($ch,CURLOPT_POST, 1);                //0 for a get request
-       curl_setopt($ch,CURLOPT_POSTFIELDS, json_encode($params));
-       curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);;
-       curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
-       curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,300);
-       curl_setopt($ch,CURLOPT_TIMEOUT, 20);
-       $response1 = curl_exec($ch);
-       curl_close ($ch);
        return response()->json(['success' => 'Verification code resent'], 200);
     }
     if(!$user){
@@ -264,31 +251,9 @@ class AuthController extends Controller
             $new_password=$this->randomPassword();
             $user->password= Hash::make($new_password);
             $user->save();
-
-        $ch = curl_init();
-          $params=[
-         'apiKey' => '120ca9639da262edc34804590b59cb40',
-         'shortCode' => 'VasPro',
-         'recipient' => strval($phone),
-         'enqueue' => 0,
-         'message' => 'Your new Residence Password is '.$new_password.'.Please change once you login in',
-         "callbackURL" => "http://vaspro.co.ke/dlr"
-       ];
+       $message = 'Your new Residence Password is '.$new_password.'.Please change once you login in';
+       $this->SMSController->sendSMS($message, strval($phone));
        
-       
-       $headers = array(
-           'Cache-control: no-cache',
-       );
-       $url = "https://api.vaspro.co.ke/v3/BulkSMS/api/create";
-       curl_setopt($ch,CURLOPT_URL, $url);
-       curl_setopt($ch,CURLOPT_POST, 1);                //0 for a get request
-       curl_setopt($ch,CURLOPT_POSTFIELDS, json_encode($params));
-       curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);;
-       curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
-       curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,300);
-       curl_setopt($ch,CURLOPT_TIMEOUT, 20);
-       $response1 = curl_exec($ch);
-       curl_close ($ch);
          return response()->json(['success' => 'Password reset succesfully'], 200);
         }
         if(!$user){

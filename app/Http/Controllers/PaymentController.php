@@ -11,7 +11,10 @@ use App\Notifications\AddressClaimed;
 class PaymentController extends Controller
 {
     //
-
+    protected $SMSController;
+    public function __construct(SMSController $SMSController){
+        $this->SMSController = $SMSController;
+    }
     public function processClaim(Request $request){
         if($request->Body['stkCallback']['ResultCode'] == '0'){
          $phone= $request->Body['stkCallback']['CallbackMetadata']['Item'][4]['Value'];
@@ -39,31 +42,9 @@ class PaymentController extends Controller
         //notify
         $user->notify(new AddressClaimed($address));
         //send sms
-        $ch = curl_init();
-        $params=[
-       'apiKey' => '120ca9639da262edc34804590b59cb40',
-       'shortCode' => 'VasPro',
-       'recipient' => strval($user->phone),
-       'enqueue' => 0,
-       'message' => 'Dear, '.$user->name.', you have claimed ownership of an address at  '.$address->building_name.', Floor no. '.$address->floor_no.' Door no. '.$address->door_no,
-       "callbackURL" => "http://vaspro.co.ke/dlr"
-     ];
-     
-     
-     $headers = array(
-         'Cache-control: no-cache',
-     );
-     $url = "https://api.vaspro.co.ke/v3/BulkSMS/api/create";
-     curl_setopt($ch,CURLOPT_URL, $url);
-     curl_setopt($ch,CURLOPT_POST, 1);                //0 for a get request
-     curl_setopt($ch,CURLOPT_POSTFIELDS, json_encode($params));
-     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-     curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
-     curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,300);
-     curl_setopt($ch,CURLOPT_TIMEOUT, 20);
-     $response1 = curl_exec($ch);
-     curl_close ($ch);
-     
+        $message = 'Dear, '.$user->name.', you have claimed ownership of an address at  '.$address->building_name.', Floor no. '.$address->floor_no.' Door no. '.$address->door_no;
+        $this->SMSController->sendSMS($message, strval($user->phone));
+        
         }
     }
 }

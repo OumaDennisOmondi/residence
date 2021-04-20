@@ -8,18 +8,21 @@ use App\Models\ResidentialAddress;
 use App\Notifications\AddressClaimed;
 use App\Notifications\AddressUnclaimed;
 use App\Models\Payment;
+use App\Http\Controllers\SMSController;
 class UniversalAddressController extends Controller
 {
     //
-    public function __construct(){
-        $this->middleware('auth', ['except' => ['home','pay','view','action']]);
+    protected $SMSController;
+    public function __construct(SMSController $SMSController){
+        $this->SMSController = $SMSController;
+        $this->middleware('auth', ['except' => ['home','pay','view','action','send_sms']]);
     }
     public function home(){
         //list business addresess that have been claimed
-        $addresses = Address::where('claimed', 1)->get();
+        $addresses = Address::where('claimed', 1)->paginate(15);
         return response()->json(['addresses' => $addresses],200);
     }
-     public function view($address_id){
+    public function view($address_id){
         $address_id = $address_id;
         $address=Address::where('address_id',$address_id)->first();
         if( !$address){
@@ -56,9 +59,11 @@ class UniversalAddressController extends Controller
         }
 
         //save payment details
+        $phonenumber = substr($request->phone, -9, strlen($request->phone));
+        $payee_phone=sprintf('254%s', trim($phonenumber));
         Payment::create([
             'user_id' => auth()->user()->id,
-            'phone'=> $request->phone,
+            'phone'=> $payee_phone,
             'address_id' => $address_id
         ]);
         //return response()->json(['success' => 'Payment saved'],200);
@@ -85,30 +90,9 @@ class UniversalAddressController extends Controller
         $address->save();
 
         //send sms
-        $ch = curl_init();
-        $params=[
-       'apiKey' => '120ca9639da262edc34804590b59cb40',
-       'shortCode' => 'VasPro',
-       'recipient' => strval(auth()->user()->phone),
-       'enqueue' => 0,
-       'message' => 'Dear, '.auth()->user()->name.', you have Unclaimed ownership of an address at  '.$address->building_name.', Floor no. '.$address->floor_no.' Door no. '.$address->door_no,
-       "callbackURL" => "http://vaspro.co.ke/dlr"
-     ];
-     
-     
-     $headers = array(
-         'Cache-control: no-cache',
-     );
-     $url = "https://api.vaspro.co.ke/v3/BulkSMS/api/create";
-     curl_setopt($ch,CURLOPT_URL, $url);
-     curl_setopt($ch,CURLOPT_POST, 1);                //0 for a get request
-     curl_setopt($ch,CURLOPT_POSTFIELDS, json_encode($params));
-     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);;
-     curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
-     curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,300);
-     curl_setopt($ch,CURLOPT_TIMEOUT, 20);
-     $response1 = curl_exec($ch);
-     curl_close ($ch);
+     $message = 'Dear, '.auth()->user()->name.', you have Unclaimed ownership of an address at  '.$address->building_name.', Floor no. '.$address->floor_no.' Door no. '.$address->door_no;
+     $this->SMSController->sendSMS($message, strval(auth()->user()->phone));
+    
         auth()->user()->notify(new AddressUnclaimed($address));
         return response()->json(['success' => 'Address Unclaimed succesfuly'],200);
     }
@@ -247,7 +231,12 @@ class UniversalAddressController extends Controller
    }
    stkPush($amount_to_pay,$payee_phone);
     }
+    //tset mpesa
     public function pay(){
         $this->initiateMpesa(2);
+    }
+    //test sms
+    public function send_sms(){
+        $this->SMSController->sendSMS('Hello world!','254742321640');
     }
 }

@@ -18,8 +18,8 @@ class CreateAddressesTable extends Migration
             $table->string('business_name')->unique();
             $table->integer('service_id')->unsigned();
             $table->text('service_description');
-            $table->string('phone')->unique();
-            $table->string('email')->unique();
+            $table->string('phone');
+            $table->string('email');
             $table->string('road');
             $table->integer('county_id')->unsigned();
             $table->integer('subcounty_id')->unsigned();
